@@ -1,6 +1,6 @@
 import React from "react";
-import Header from "../Header/Header";
-import SideNav from "../Header/SideNav";
+import Header from "../components/Header/Header.jsx";
+import SideNav from "../components/Header/SideNav.jsx";
 
 const AllSubscriptions = () => {
   return (

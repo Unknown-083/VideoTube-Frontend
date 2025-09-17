@@ -10,9 +10,9 @@ import {
   User,
   LogOut,
 } from "lucide-react";
-import SideNav from "../Header/SideNav";
-import Header from "../Header/Header";
-import Videos from "../Videos";
+import Header from "../components/Header/Header.jsx";
+import SideNav from "../components/Header/SideNav.jsx";
+import Videos from "../components/Videos.jsx";
 
 const Homepage = () => {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -27,8 +27,6 @@ const Homepage = () => {
     "Education",
     "Technology",
   ];
-
-  console.log("works");
   
   return (
     <div className="font-sans bg-black min-h-screen text-white">

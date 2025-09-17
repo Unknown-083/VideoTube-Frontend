@@ -1,9 +1,26 @@
 import React from "react";
 import { HomeIcon, User, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { logout as authLogout } from "../../auth/authSlice";
 
 const SideNav = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const hangleLogout = () => {
+    // Clear user data from local storage or cookies
+    axios.post("/api/v1/users/logout")
+    .then((res) => {
+      console.log("Logged out", res);
+      dispatch(authLogout());
+      navigate("/login");
+    })
+    .catch((err) => {
+      console.error("Logout error:", err.response ? err.response.data : err.message);
+    });
+  }
   return (
     <div className="fixed min-h-screen min-w-15 p-2 flex flex-col gap-5">
       {/* <h1>sidenav</h1> */}
@@ -36,7 +53,7 @@ const SideNav = () => {
         <p className="text-[10px]">Profile</p>
       </div>
 
-      <div className="flex flex-col items-center gap-0.5" onClick={() => navigate("/logout")}>
+      <div className="flex flex-col items-center gap-0.5" onClick={hangleLogout}>
         <div className="rounded-full border border-gray-700 mx-auto hover:bg-gray-600 p-3 content-center">
           <LogOut />
         </div>

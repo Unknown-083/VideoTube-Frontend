@@ -1,7 +1,7 @@
 import React from "react";
-import Header from "../Header/Header";
-import SideNav from "../Header/SideNav";
-import Videos from "../Videos";
+import Header from "../components/Header/Header.jsx";
+import SideNav from "../components/Header/SideNav.jsx";
+import Videos from "../components/Videos.jsx";
 import { useNavigate } from "react-router-dom";
 
 const Subscription = () => {

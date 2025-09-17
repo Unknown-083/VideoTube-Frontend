@@ -1,6 +1,6 @@
 import React from "react";
-import Header from "../Header/Header";
-import Videos from "../Videos";
+import Header from "../components/Header/Header";
+import Videos from "../components/Videos";
 import { Bookmark, Share2, ThumbsDown, ThumbsUp } from "lucide-react";
 
 const Video = () => {
