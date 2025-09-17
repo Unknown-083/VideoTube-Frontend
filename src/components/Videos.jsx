@@ -1,133 +1,125 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { MoreVertical, Play } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { setVideos } from "../auth/videoSlice";
 
-const Videos = ({
-  grid = true,
-}) => {
-    
-  const videos = [
-    {
-      id: 1,
-      title: "Amazing Nature Documentary: Wild Life Safari",
-      channel: "NatureHub",
-      views: "2.3M",
-      time: "3 days ago",
-      duration: "12:45",
-    },
-    {
-      id: 2,
-      title: "JavaScript Tutorial for Beginners - Complete Guide",
-      channel: "CodeMaster",
-      views: "856K",
-      time: "1 week ago",
-      duration: "45:20",
-    },
-    {
-      id: 3,
-      title: "Epic Gaming Moments Compilation 2024",
-      channel: "GameZone",
-      views: "1.2M",
-      time: "2 days ago",
-      duration: "8:15",
-    },
-    {
-      id: 4,
-      title: "Cooking Masterclass: Authentic Italian Pasta",
-      channel: "ChefLife",
-      views: "445K",
-      time: "5 days ago",
-      duration: "18:30",
-    },
-    {
-      id: 5,
-      title: "Latest Tech News Update - AI Revolution",
-      channel: "TechToday",
-      views: "678K",
-      time: "1 day ago",
-      duration: "15:22",
-    },
-    {
-      id: 6,
-      title: "Full Body Fitness Workout at Home",
-      channel: "FitnessPro",
-      views: "923K",
-      time: "4 days ago",
-      duration: "25:10",
-    },
-    {
-      id: 7,
-      title: "Travel Vlog: Mountain Adventure in Nepal",
-      channel: "Wanderlust",
-      views: "334K",
-      time: "1 week ago",
-      duration: "22:45",
-    },
-    {
-      id: 8,
-      title: "Music Production Masterclass with Pro Tips",
-      channel: "BeatMakers",
-      views: "567K",
-      time: "3 days ago",
-      duration: "35:15",
-    },
-    {
-      id: 9,
-      title: "DIY Home Renovation Tips and Tricks",
-      channel: "HomeImprove",
-      views: "789K",
-      time: "2 weeks ago",
-      duration: "28:33",
-    },
-    {
-      id: 10,
-      title: "Cryptocurrency Explained Simply for Everyone",
-      channel: "CryptoGuide",
-      views: "1.1M",
-      time: "1 week ago",
-      duration: "16:42",
-    },
-    {
-      id: 11,
-      title: "Photography Tips for Beginners - Light & Composition",
-      channel: "PhotoPro",
-      views: "445K",
-      time: "5 days ago",
-      duration: "19:28",
-    },
-    {
-      id: 12,
-      title: "Science Experiment Gone Wild! Explosive Results",
-      channel: "ScienceFun",
-      views: "2.1M",
-      time: "3 days ago",
-      duration: "11:17",
-    },
-  ];
-  
+const Videos = ({ grid = true }) => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  
+  const videos = useSelector((state) => state.video.videos);
+
+  function timeAgo(dateString) {
+    const now = new Date();
+    const past = new Date(dateString);
+    const diffInSeconds = Math.floor((now - past) / 1000);
+
+    const intervals = [
+      { label: "year", seconds: 31536000 },
+      { label: "month", seconds: 2592000 },
+      { label: "day", seconds: 86400 },
+      { label: "hour", seconds: 3600 },
+      { label: "minute", seconds: 60 },
+      { label: "second", seconds: 1 },
+    ];
+
+    for (const interval of intervals) {
+      const count = Math.floor(diffInSeconds / interval.seconds);
+      if (count >= 1) {
+        return `${count} ${interval.label}${count > 1 ? "s" : ""} ago`;
+      }
+    }
+
+    return "just now";
+  }
+
+  function formatViews(views) {
+    if (views >= 1e9) {
+      return (views / 1e9).toFixed(1) + "B views";
+    } else if (views >= 1e6) {
+      return (views / 1e6).toFixed(1) + "M views";
+    } else if (views >= 1e3) {
+      return (views / 1e3).toFixed(1) + "K views";
+    } else {
+      return `${views} views`;
+    }
+  }
+
+  function formatDuration(durationInSeconds) {
+    const totalSeconds = Math.floor(durationInSeconds);
+
+    const hours = Math.floor(totalSeconds / 3600);
+    const mins = Math.floor((totalSeconds % 3600) / 60)
+      .toString()
+      .padStart(2, "0");
+    const secs = (totalSeconds % 60).toString().padStart(2, "0");
+
+    if (hours > 0) {
+      return `${hours.toString().padStart(2, "0")}:${mins}:${secs}`;
+    } else {
+      return `${mins}:${secs}`;
+    }
+  }
+
+  useEffect(() => {
+    const getVideos = async () => {
+      try {
+        await axios.get("/api/v1/videos").then((res) => {
+          console.log("videos", res.data.data?.videos);
+          // allvideos = res.data.data?.videos;
+          dispatch(setVideos(res.data.data?.videos));
+        });
+      } catch (error) {
+        console.error("Error fetching videos:", error);
+      }
+    };
+    getVideos();
+  }, []);
+
+  useEffect(() => {
+    console.log("allvideos", videos);
+  }, [videos]);
+
   return (
-    <div className={grid?`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6` : `flex gap-4 overflow-scrollbar-hide`}>
+    <div
+      className={
+        grid
+          ? `grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6`
+          : `flex gap-4 overflow-scrollbar-hide`
+      }
+    >
       {videos.map((video) => (
-        <div key={video.id} className="group cursor-pointer" onClick={() => navigate("/video")}>
+        <div
+          key={video.id}
+          className="group cursor-pointer"
+          onClick={() => navigate("/video")}
+        >
           {/* Thumbnail */}
-          <div className={`relative aspect-video bg-gray-600 rounded-xl overflow-hidden mb-3 ${grid ? '' : 'w-55 flex-shrink-0'}`}>
-            <div className="absolute inset-0 flex items-center justify-center group-hover:bg-black group-hover:bg-opacity-20 transition-all">
+          <div
+            className={`relative aspect-video  rounded-xl overflow-hidden mb-3 ${
+              grid ? "" : "w-55 flex-shrink-0"
+            } bg-cover bg-center`}
+            style={{ backgroundImage: `url(${video.thumbnail})` }}
+          >
+            <div className="absolute inset-0 flex items-center justify-center group-hover:bg-opacity-90 hover:bg-opacity-80 transition-all">
               <Play className="w-12 h-12 text-white opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all" />
             </div>
             <div className="absolute bottom-2 right-2 bg-black bg-opacity-80 px-2 py-1 rounded text-xs font-medium">
-              {video.duration}
+              {formatDuration(video.duration)}
             </div>
           </div>
 
           {/* Video Info */}
           <div className="flex gap-3">
-            <div className="w-9 h-9 bg-gradient-to-br from-teal-600 to-green-800 rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-xs font-bold text-white">
-                {video.channel.charAt(0)}
-              </span>
-            </div>
+            <div
+              className="w-9 h-9 bg-gradient-to-br from-teal-600 to-green-800 rounded-full flex items-center justify-center flex-shrink-0"
+              style={{
+                backgroundImage: `url(${video.avatar})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            ></div>
 
             <div className="flex-1 min-w-0">
               <h3 className="font-medium text-white group-hover:text-gray-300 transition-colors line-clamp-2 mb-1">
@@ -139,9 +131,9 @@ const Videos = ({
               </p>
 
               <div className="text-xs text-gray-500 flex items-center gap-1">
-                <span>{video.views} views</span>
+                <span>{formatViews(video.views)} views</span>
                 <span>•</span>
-                <span>{video.time}</span>
+                <span>{timeAgo(video.time)}</span>
               </div>
             </div>
 
