@@ -1,43 +1,64 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Header from "../components/Header/Header";
 import Videos from "../components/Videos";
 import { Bookmark, Share2, ThumbsDown, ThumbsUp } from "lucide-react";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 
 const Video = () => {
-  const Videos = [
-    {
-      title: "Video Title",
-      views: "1.2M views",
-      timestamp: "2 days ago",
-      channelImage: "https://via.placeholder.com/36",
-      channel: "Channel Name",
-      image: "https://via.placeholder.com/210x118",
-    },
-    {
-      title: "Video Title",
-      views: "1.2M views",
-      timestamp: "2 days ago",
-      channelImage: "https://via.placeholder.com/36",
-      channel: "Channel Name",
-      image: "https://via.placeholder.com/210x118",
-    },
-    {
-      title: "Video Title",
-      views: "1.2M views",
-      timestamp: "2 days ago",
-      channelImage: "https://via.placeholder.com/36",
-      channel: "Channel Name",
-      image: "https://via.placeholder.com/210x118",
-    },
-    {
-      title: "Video Title",
-      views: "1.2M views",
-      timestamp: "2 days ago",
-      channelImage: "https://via.placeholder.com/36",
-      channel: "Channel Name",
-      image: "https://via.placeholder.com/210x118",
-    },
-  ];
+  // const Videos = [
+  //   {
+  //     title: "Video Title",
+  //     views: "1.2M views",
+  //     timestamp: "2 days ago",
+  //     channelImage: "https://via.placeholder.com/36",
+  //     channel: "Channel Name",
+  //     image: "https://via.placeholder.com/210x118",
+  //   },
+  //   {
+  //     title: "Video Title",
+  //     views: "1.2M views",
+  //     timestamp: "2 days ago",
+  //     channelImage: "https://via.placeholder.com/36",
+  //     channel: "Channel Name",
+  //     image: "https://via.placeholder.com/210x118",
+  //   },
+  //   {
+  //     title: "Video Title",
+  //     views: "1.2M views",
+  //     timestamp: "2 days ago",
+  //     channelImage: "https://via.placeholder.com/36",
+  //     channel: "Channel Name",
+  //     image: "https://via.placeholder.com/210x118",
+  //   },
+  //   {
+  //     title: "Video Title",
+  //     views: "1.2M views",
+  //     timestamp: "2 days ago",
+  //     channelImage: "https://via.placeholder.com/36",
+  //     channel: "Channel Name",
+  //     image: "https://via.placeholder.com/210x118",
+  //   },
+  // ];
+  
+  const videos = useSelector((state) => state.video.videos);
+  const [videoDetails, setVideoDetails] = React.useState(null);
+
+  const {id} = useParams();
+  useEffect(() => {
+    const getVideoDetails = async () => {
+      try {
+        const {data} = await axios.get(`/api/v1/videos/${id}`);
+        console.log("Video :: getVideoDetails :: res:", data.data[0]);
+        setVideoDetails(data.data[0]);
+      } catch (error) {
+        console.error("Video :: getVideoDetails :: Error fetching video details:", error);        
+      }
+    };
+    getVideoDetails();
+  }, [])
+  
   return (
     <div>
       <Header />
@@ -51,7 +72,8 @@ const Video = () => {
 
           <div className="mt-4">
             <h1 className="text-2xl font-bold text-white">
-              Video Title - Full Title Here
+              {/* Video Title - Full Title Here */}
+              {videoDetails?.title}
             </h1>
 
             <div className="flex mt-2">
@@ -69,16 +91,16 @@ const Video = () => {
                 </div>
 
                 <div className="flex gap-2 items-center text-sm">
-                  <div className="rounded-full items-center p-1.5 px-4 bg-gray-600 flex gap-1 cursor-pointer hover:text-white">
+                  <div className="rounded-full items-center p-1.5 px-4 bg-gray-700 flex gap-1 cursor-pointer hover:text-white">
                     <ThumbsUp className="p-0.5"/>{" "}
                     <span className="pr-3 font-medium border-r border-r-gray-400">100</span>
                     <ThumbsDown className="ml-2 p-0.5"/>
                   </div>
-                  <div className="rounded-full self-center p-1.5 pr-2.5 bg-gray-600 cursor-pointer hover:text-white flex gap-1 items-center">
+                  <div className="rounded-full self-center p-1.5 pr-2.5 bg-gray-700 cursor-pointer hover:text-white flex gap-1 items-center">
                     <Share2 className="p-0.5"/>
                     <span className="font-medium">Share</span>
                   </div>
-                  <div className="rounded-full self-center p-1.5 bg-gray-600 cursor-pointer hover:text-white">
+                  <div className="rounded-full self-center p-1.5 bg-gray-700 cursor-pointer hover:text-white">
                     <Bookmark className="p-0.5"/>
                   </div>
                 </div>
@@ -86,8 +108,8 @@ const Video = () => {
             </div>
 
             {/* Description */}
-            <div className="mt-4 p-2 text-sm bg-gray-800 rounded-lg">
-              <div className="font-medium">1.2M views • Jan 1, 2023</div>
+            <div className="mt-4 p-2 text-sm bg-gray-700 rounded-lg">
+              <div className="font-medium">1.2M views • {}</div>
               <p className="text-white">
                 This is the video description. It provides more details about
                 the video content, links, and other relevant information.
@@ -98,10 +120,10 @@ const Video = () => {
 
         {/* More Videos */}
         <div className="w-[40%] h-90 p-2 pt-0">
-          {Videos.map((video, index) => (
+          {videos.map((video, index) => (
             <div key={index} className="flex mb-4">
               <img
-                src={video.image}
+                src={video.avatar}
                 alt={video.title}
                 className="w-40 h-24 rounded-lg bg-gray-500 mr-4"
               />

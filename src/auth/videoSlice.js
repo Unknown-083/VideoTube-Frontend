@@ -21,35 +21,7 @@ const videoSlice = createSlice({
   reducers: {
     setVideos: (state, action) => {
       console.log("action.payload", action.payload);
-      const newVideos = action.payload.map((video) => {
-        const {
-          _id,
-          title,
-          description,
-          videoFile,
-          thumbnail,
-          views,
-          duration,
-          owner,
-          updatedAt,
-        } = video;
-
-        return {
-          id: _id,
-          title,
-          description,
-          channel: owner?.fullname || "Unknown",
-          avatar: owner?.avatar?.url || "",
-          videoFile: videoFile?.url || "",
-          thumbnail: thumbnail?.url || "",
-          views,
-          time: updatedAt,
-          duration,
-        };
-      });
-
-      state.videos = [...newVideos];
-      console.log("state.videos", state.videos);
+      state.videos = action.payload
     },
   },
 });

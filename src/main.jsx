@@ -25,7 +25,7 @@ const router = createBrowserRouter(
       <Route path="profile" element={<Profile />} />
       <Route path="subscriptions" element={<Subscription />} />
       <Route path="all-subscriptions" element={<AllSubscriptions />} />
-      <Route path="video" element={<Video />} />
+      <Route path="video/:id" element={<Video />} />
       <Route path="login" element={<Login />} />
       <Route path="signup" element={<Signup />} />
     </Route>,

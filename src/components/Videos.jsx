@@ -1,12 +1,9 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { MoreVertical, Play } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { useDispatch, useSelector } from "react-redux";
-import { setVideos } from "../auth/videoSlice";
+import { useSelector } from "react-redux";
 
 const Videos = ({ grid = true }) => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const videos = useSelector((state) => state.video.videos);
 
@@ -34,49 +31,6 @@ const Videos = ({ grid = true }) => {
     return "just now";
   }
 
-  function formatViews(views) {
-    if (views >= 1e9) {
-      return (views / 1e9).toFixed(1) + "B views";
-    } else if (views >= 1e6) {
-      return (views / 1e6).toFixed(1) + "M views";
-    } else if (views >= 1e3) {
-      return (views / 1e3).toFixed(1) + "K views";
-    } else {
-      return `${views} views`;
-    }
-  }
-
-  function formatDuration(durationInSeconds) {
-    const totalSeconds = Math.floor(durationInSeconds);
-
-    const hours = Math.floor(totalSeconds / 3600);
-    const mins = Math.floor((totalSeconds % 3600) / 60)
-      .toString()
-      .padStart(2, "0");
-    const secs = (totalSeconds % 60).toString().padStart(2, "0");
-
-    if (hours > 0) {
-      return `${hours.toString().padStart(2, "0")}:${mins}:${secs}`;
-    } else {
-      return `${mins}:${secs}`;
-    }
-  }
-
-  useEffect(() => {
-    const getVideos = async () => {
-      try {
-        await axios.get("/api/v1/videos").then((res) => {
-          console.log("videos", res.data.data?.videos);
-          // allvideos = res.data.data?.videos;
-          dispatch(setVideos(res.data.data?.videos));
-        });
-      } catch (error) {
-        console.error("Error fetching videos:", error);
-      }
-    };
-    getVideos();
-  }, []);
-
   useEffect(() => {
     console.log("allvideos", videos);
   }, [videos]);
@@ -93,7 +47,7 @@ const Videos = ({ grid = true }) => {
         <div
           key={video.id}
           className="group cursor-pointer"
-          onClick={() => navigate("/video")}
+          onClick={() => navigate(`/video/${video.id}`)}
         >
           {/* Thumbnail */}
           <div
@@ -106,7 +60,7 @@ const Videos = ({ grid = true }) => {
               <Play className="w-12 h-12 text-white opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all" />
             </div>
             <div className="absolute bottom-2 right-2 bg-black bg-opacity-80 px-2 py-1 rounded text-xs font-medium">
-              {formatDuration(video.duration)}
+              {video.duration}
             </div>
           </div>
 
@@ -122,16 +76,16 @@ const Videos = ({ grid = true }) => {
             ></div>
 
             <div className="flex-1 min-w-0">
-              <h3 className="font-medium text-white group-hover:text-gray-300 transition-colors line-clamp-2 mb-1">
+              <h3 className="font-medium text-white group-hover:text-gray-300 transition-colors line-clamp-2 mb-0.5">
                 {video.title}
               </h3>
 
-              <p className="text-sm text-gray-400 hover:text-gray-300 cursor-pointer transition-colors mb-1">
+              <p className="text-sm text-gray-400 hover:text-gray-300 cursor-pointer transition-colors">
                 {video.channel}
               </p>
 
-              <div className="text-xs text-gray-500 flex items-center gap-1">
-                <span>{formatViews(video.views)} views</span>
+              <div className="text-xs text-gray-400 flex items-center gap-1">
+                <span>{video.views}</span>
                 <span>•</span>
                 <span>{timeAgo(video.time)}</span>
               </div>
