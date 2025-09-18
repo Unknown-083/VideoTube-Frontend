@@ -107,7 +107,7 @@ function App() {
           videoFile: video.videoFile?.url || "",
           thumbnail: video.thumbnail?.url || "",
           views: formatViews(video.views),
-          time: video.updatedAt,
+          time: timeAgo(video.updatedAt),
           duration: formatDuration(video.duration),
         }));
 
