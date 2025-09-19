@@ -4,7 +4,7 @@ import Videos from "../components/Videos";
 import { Bookmark, Share2, ThumbsDown, ThumbsUp } from "lucide-react";
 import axios from "axios";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const Video = () => {
   // const Videos = [
@@ -44,6 +44,7 @@ const Video = () => {
 
   const videos = useSelector((state) => state.video.videos);
   const [video, setVideo] = React.useState(null);
+  const navigate = useNavigate();
 
   const { id } = useParams();
   useEffect(() => {
@@ -60,7 +61,7 @@ const Video = () => {
       }
     };
     getVideoDetails();
-  }, []);
+  }, [id]);
 
   function formatViews(views) {
     if (views >= 1e9) {
@@ -93,9 +94,20 @@ const Video = () => {
         {/* Video */}
         <div className="w-[60%]">
           <div
-            className="h-90 bg-gray-500 rounded-2xl bg-cover bg-center"
+            className="h-80 bg-gray-500 rounded-2xl bg-cover bg-center"
             style={{ backgroundImage: `url(${video?.thumbnail?.url})` }}
-          ></div>
+          >
+            <video
+              src={video?.videoFile.url}
+              poster={video?.thumbnail.url}
+              controls
+              autoPlay
+              playsInline
+              controlsList="nodownload"
+              className="h-full w-full bg-black fill-black"
+              style={{ backgroundColor: "black" }}
+            ></video>
+          </div>
 
           {/* Video Details */}
 
@@ -148,11 +160,9 @@ const Video = () => {
             {/* Description */}
             <div className="mt-4 p-2 text-sm bg-gray-700 rounded-lg">
               <div className="font-medium">
-                {formatViews(video?.views)} • {formatDate(video.updatedAt)}
+                {formatViews(video?.views)} • {formatDate(video?.updatedAt)}
               </div>
-              <p className="text-white">
-                {video.description}
-              </p>
+              <p className="text-white">{video?.description}</p>
             </div>
           </div>
         </div>
@@ -160,7 +170,11 @@ const Video = () => {
         {/* More Videos */}
         <div className="w-[40%] h-90 p-2 pt-0">
           {videos.map((video, index) => (
-            <div key={index} className="flex mb-4">
+            <div
+              onClick={() => navigate(`/video/${video.id}`)}
+              key={index}
+              className="flex mb-4 cursor-pointer"
+            >
               <img
                 src={video.avatar}
                 alt={video.title}
