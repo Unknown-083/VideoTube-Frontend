@@ -29,16 +29,16 @@ const Homepage = () => {
   ];
   
   return (
-    <div className="font-sans bg-black min-h-screen text-white">
+    <div className="font-sans min-h-screen text-white">
       {/* Header */}
       <Header/>
 
-      <div className="flex relative">
+      <div className="flex relative w-full">
         <SideNav/>
 
-        <div>
+        <div className="w-full">
           {/* Navigation */}
-          <nav className="bg-black ml-15 px-6 overflow-x-auto">
+          <nav className="ml-15 px-6 overflow-x-auto">
             <div className="flex gap-3 min-w-max">
               {categories.map((category) => (
                 <button
@@ -47,7 +47,7 @@ const Homepage = () => {
                   className={`px-4 py-2 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
                     activeCategory === category
                       ? "bg-white text-black"
-                      : "bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white"
+                      : "bg-[#272727] text-gray-300 hover:text-white"
                   }`}
                 >
                   {category}

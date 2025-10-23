@@ -46,7 +46,7 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-8">
       <form method="post" onSubmit={login} className="w-full">
-        <div className="flex flex-col gap-6 w-full max-w-md mx-auto p-8 border border-gray-600 rounded-xl shadow-2xl">
+        <div className="flex flex-col gap-6 w-full max-w-md mx-auto p-8 border border-[#272727] rounded-xl shadow-2xl">
           {/* Header */}
           <div className="text-center mb-4">
             <h2 className="text-4xl font-bold text-white mb-2">Welcome Back</h2>
@@ -77,7 +77,7 @@ const Login = () => {
           </button>
         
           {/* Signup Link */}
-          <div className="pt-4 border-t border-gray-700">
+          <div className="pt-4 border-t border-[#272727]">
             <p className="text-sm text-gray-400 text-center">
               Don't have an account?{" "}
               <Link 

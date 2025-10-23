@@ -7,13 +7,13 @@ import { useNavigate } from "react-router-dom";
 const Subscription = () => {
   const navigate = useNavigate();
   return (
-    <div className="bg-black min-h-screen text-white">
+    <div className="min-h-screen text-white">
       <Header />
-      <div className="flex">
+      <div className="flex w-full">
         <SideNav />
-        <div className="p-6 ml-15">
+        <div className="p-6 ml-15 w-full">
           <h1 className="text-3xl font-bold mb-4">Subscription</h1>
-          <div className="flex justify-between mb-4">
+          <div className="flex justify-between mb-4 w-full">
             <h2 className="text-xl text-gray-400">Latest Videos</h2>
             <h2 className="text-md text-blue-400 cursor-pointer hover:text-blue-500" onClick={() => navigate("/all-subscriptions")}>Manage</h2>
           </div>

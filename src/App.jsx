@@ -74,8 +74,6 @@ function App() {
       try {
         const user = await axios.get("/api/v1/users/get-user");
 
-        console.log("user", user.data.data?.data);
-
         if (!user) {
           navigate("/login");
         }
@@ -92,12 +90,8 @@ function App() {
     const getVideos = async () => {
       try {
         const { data } = await axios.get("/api/v1/videos");
-        console.log("videos", data.data?.videos);
         const allvideos = data.data?.videos;
-
-        console.log("owner", allvideos[0]?.owner.fullname);
-        
-
+      
         const finalVideos = allvideos.map((video) => ({
           id: video._id,
           title: video.title,
@@ -107,11 +101,9 @@ function App() {
           videoFile: video.videoFile?.url || "",
           thumbnail: video.thumbnail?.url || "",
           views: formatViews(video.views),
-          time: timeAgo(video.updatedAt),
+          time: timeAgo(video.createdAt),
           duration: formatDuration(video.duration),
         }));
-
-        console.log("finalVideos", finalVideos);        
 
         dispatch(setVideos(finalVideos));
         

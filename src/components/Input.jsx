@@ -20,7 +20,7 @@ const Input = ({
         placeholder={placeholder}
         ref={ref}
         {...(type !== "file" && { value })}
-        className={`border border-gray-700 rounded-full px-4 py-2 ${bgColor} ${textColor} ${classname}`}
+        className={`border border-[#272727] rounded-full px-4 py-2 ${bgColor} ${textColor} ${classname}`}
         id={id}
         {...props}
       />

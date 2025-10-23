@@ -4,7 +4,7 @@ import SideNav from "../components/Header/SideNav.jsx";
 
 const AllSubscriptions = () => {
   return (
-    <div className="bg-black min-h-screen text-white">
+    <div className="min-h-screen text-white">
       <Header />
       <div className="flex">
         <SideNav />

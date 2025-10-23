@@ -25,14 +25,14 @@ const SideNav = () => {
     <div className="fixed min-h-screen min-w-15 p-2 flex flex-col gap-5">
       {/* <h1>sidenav</h1> */}
       <div className="flex flex-col items-center gap-0.5" onClick={() => navigate("/")}>
-        <div className="rounded-full border border-gray-700 mx-auto hover:bg-gray-600 p-3 content-center">
+        <div className="rounded-full border border-[#272727] mx-auto hover:bg-[#272727] p-3 content-center">
           <HomeIcon />
         </div>
         <p className="text-[10px]">Home</p>
       </div>
 
       <div className="flex flex-col items-center gap-0.5" onClick={() => navigate("/subscriptions")}>
-        <div className="rounded-full border border-gray-700 mx-auto hover:bg-gray-600 p-3 content-center">
+        <div className="rounded-full border border-[#272727] mx-auto hover:bg-[#272727] p-3 content-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             height="24px"
@@ -47,14 +47,14 @@ const SideNav = () => {
       </div>
 
       <div className="flex flex-col items-center gap-0.5" onClick={() => navigate("/profile")}>
-        <div className="rounded-full border border-gray-700 mx-auto hover:bg-gray-600 p-3 content-center">
+        <div className="rounded-full border border-[#272727] mx-auto hover:bg-[#272727] p-3 content-center">
           <User />
         </div>
         <p className="text-[10px]">Profile</p>
       </div>
 
       <div className="flex flex-col items-center gap-0.5" onClick={hangleLogout}>
-        <div className="rounded-full border border-gray-700 mx-auto hover:bg-gray-600 p-3 content-center">
+        <div className="rounded-full border border-[#272727] mx-auto hover:bg-[#272727] p-3 content-center">
           <LogOut />
         </div>
         <p className="text-[10px]">Logout</p>

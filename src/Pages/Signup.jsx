@@ -101,7 +101,7 @@ const Signup = () => {
         </button>
 
         {/* Login Link */}
-        <div className="pt-4 border-t border-gray-700">
+        <div className="pt-4 border-t border-[#272727]">
           <p className="text-sm text-gray-400 text-center">
             Already have an account?{" "}
             <Link
