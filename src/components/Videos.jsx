@@ -10,14 +10,17 @@ const Videos = ({ grid = true, videoArray = null }) => {
 
   const localVideos = useSelector((state) => state.video.videos);
 
-  useEffect(() => {    
+  useEffect(() => {
     if (!videoArray) {
       setVideos(localVideos);
     } else {
-      console.log("Video Array :: ",videoArray[0]);
+      // console.log("Video Array :: ",videoArray[0]);
       setVideos(videoArray);
     }
-  }, [setVideos]);
+  }, [videoArray, localVideos]);
+
+  // console.log(videos);
+  
 
   if(videos){
     return (
@@ -40,7 +43,7 @@ const Videos = ({ grid = true, videoArray = null }) => {
               className={`relative aspect-video  rounded-xl overflow-hidden mb-3 ${
                 grid ? "" : "w-55 flex-shrink-0"
               } bg-cover bg-center`}
-              style={{ backgroundImage: `url(${video.thumbnail?.url})` }}
+              style={{ backgroundImage: `url(${video?.thumbnail?.url || video.thumbnail})` }}
             >
               {/* <div className="absolute inset-0 flex items-center justify-center group-hover:bg-opacity-90 hover:bg-opacity-80 transition-all">
                 <Play className="w-12 h-12 text-white opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all" />
@@ -55,7 +58,7 @@ const Videos = ({ grid = true, videoArray = null }) => {
               <div
                 className="w-9 h-9 bg-gradient-to-br from-teal-600 to-green-800 rounded-full flex items-center justify-center flex-shrink-0"
                 style={{
-                  backgroundImage: `url(${video.avatar})`,
+                  backgroundImage: `url(${video.owner?.avatar?.url || video.avatar})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                 }}

@@ -1,15 +1,4 @@
 import { useState } from "react";
-import {
-  Search,
-  Upload,
-  Bell,
-  Menu,
-  Play,
-  MoreVertical,
-  HomeIcon,
-  User,
-  LogOut,
-} from "lucide-react";
 import Header from "../components/Header/Header.jsx";
 import SideNav from "../components/Header/SideNav.jsx";
 import Videos from "../components/Videos.jsx";

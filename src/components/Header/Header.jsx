@@ -15,7 +15,7 @@ const Header = () => {
             <Play className="w-5 h-5 text-white fill-current" />
           </div>
           <span className="text-xl font-bold group-hover:text-gray-300 transition-colors">
-            StreamHub
+            चलचित्र
           </span>
         </div>
       </div>

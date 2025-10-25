@@ -5,12 +5,14 @@ import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { login } from "./auth/authSlice";
 import axios from "axios";
-import { setVideos } from "./auth/videoSlice.js";
+import { setLikedVideos, setVideos, setWatchHistory } from "./auth/videoSlice.js";
+import Loading from "./components/Loading.jsx";
 
 function App() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
+  const [isLoading, setIsLoading] = useState(true);
 
   function timeAgo(dateString) {
     const now = new Date();
@@ -64,6 +66,7 @@ function App() {
     }
   }
 
+  // Check if user is logged in
   useEffect(() => {
     if (auth.status) {
       console.log("User is already logged in");
@@ -86,17 +89,18 @@ function App() {
     getCurentUser();
   }, [auth.status, navigate, dispatch]);
 
+  // Fetch videos from server
   useEffect(() => {
     const getVideos = async () => {
       try {
         const { data } = await axios.get("/api/v1/videos");
         const allvideos = data.data?.videos;
-      
+
         const finalVideos = allvideos.map((video) => ({
           id: video._id,
           title: video.title,
           description: video.description,
-          channel: video.owner.fullname ,
+          channel: video.owner.fullname,
           avatar: video.owner?.avatar?.url || "",
           videoFile: video.videoFile?.url || "",
           thumbnail: video.thumbnail?.url || "",
@@ -106,7 +110,6 @@ function App() {
         }));
 
         dispatch(setVideos(finalVideos));
-        
       } catch (error) {
         console.error("Error fetching videos:", error);
       }
@@ -114,9 +117,66 @@ function App() {
     getVideos();
   }, [dispatch]);
 
+  // Fetch watch history and liked videos could be added here similarly
+
+  useEffect(() => {
+    const getWatchHistoryAndLikedVideos = async () => {
+      try {
+        // Watch History
+        let { data } = await axios.get("/api/v1/users/history");
+        console.log("watch history :: ", data);
+
+        let allVideos = data.data;
+
+        const watchHistory = allVideos.map((video) => ({
+          id: video._id,
+          title: video.title,
+          description: video.description,
+          channel: video.owner?.fullname,
+          avatar: video.owner?.avatar?.url || "",
+          videoFile: video.videoFile?.url || "",
+          thumbnail: video.thumbnail?.url || "",
+          views: formatViews(video.views),
+          time: timeAgo(video.createdAt),
+          duration: formatDuration(video.duration),
+        }));
+
+        console.log("Formatted Watch History :: ", watchHistory);
+        dispatch(setWatchHistory(watchHistory));
+        
+        // Liked Videos can be fetched and dispatched similarly
+        data = await axios.get("/api/v1/likes/videos");
+        console.log("liked videos :: ", data.data.data);
+
+        allVideos = data.data.data[0].video;
+        
+        const likedVideos = allVideos.map((video) => ({
+          id: video._id,
+          title: video.title,
+          description: video.description,
+          channel: video.owner.fullname,
+          avatar: video.owner?.avatar?.url || "",
+          videoFile: video.videoFile?.url || "",
+          thumbnail: video.thumbnail?.url || "",
+          views: formatViews(video.views),
+          time: timeAgo(video.createdAt),
+          duration: formatDuration(video.duration),
+        }));
+
+        console.log("Formatted Liked Videos :: ", likedVideos);
+        dispatch(setLikedVideos(likedVideos));        
+
+        setIsLoading(false);
+      } catch (error) {
+        console.error("App.jsx :: getWatchHistory :: error ", error);        
+      }
+    };
+    getWatchHistoryAndLikedVideos();
+  }, []);
+
   return (
     <>
-      <Outlet />
+      {isLoading ? <Loading /> : <Outlet />}
     </>
   );
 }

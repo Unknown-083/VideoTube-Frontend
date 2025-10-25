@@ -7,21 +7,8 @@ import axios from "axios";
 
 const Profile = () => {
   const user = useSelector((state) => state.auth.userData);
-  const [watchHistory, setWatchHistory] = useState();
-  const [likedVideos, setLikedVideos] = useState();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      let { data } = await axios.get("/api/v1/users/history");
-      console.log("watch history :: ", data.data);
-      setWatchHistory(data.data);
-
-      data = await axios.get("/api/v1/likes/videos");
-      console.log("liked videos :: ", data.data.data[0].video);
-      setLikedVideos(data.data.data[0].video);
-    };
-    fetchData();
-  }, []);
+  const {watchHistory} = useSelector((state) => state.video);
+  const {likedVideos} = useSelector((state) => state.video);  
 
   return (
     <div className="min-h-screen">
@@ -52,7 +39,7 @@ const Profile = () => {
           <div className="mt-8 w-full">
             <div className="flex justify-between mb-3">
               <h2 className="text-2xl font-bold">History</h2>
-              <div className="rounded-full border border-gray-500 px-3 py-1">
+              <div className="rounded-full border border-[#272727] px-3 py-1">
                 View all
               </div>
             </div>
@@ -69,7 +56,7 @@ const Profile = () => {
           <div className="mt-8">
             <div className="flex justify-between mb-3">
               <h2 className="text-2xl font-bold">Playlists</h2>
-              <div className="rounded-full border border-gray-500 px-3 py-1">
+              <div className="rounded-full border border-[#272727] px-3 py-1">
                 View all
               </div>
             </div>
@@ -84,7 +71,7 @@ const Profile = () => {
                 <h2 className="text-2xl font-bold">Watch Later</h2>
                 <p className="text-xs text-gray-400">20 Videos</p>
               </div>
-              <div className="rounded-full border h-fit border-gray-500 px-3 py-1">
+              <div className="rounded-full border h-fit border-[#272727] px-3 py-1">
                 View all
               </div>
             </div>
@@ -101,7 +88,7 @@ const Profile = () => {
                 <h2 className="text-2xl font-bold">Liked Videos</h2>
                 <p className="text-xs text-gray-400">100 Videos</p>
               </div>
-              <div className="rounded-full border h-fit border-gray-500 px-3 py-1">
+              <div className="rounded-full border h-fit border-[#272727] px-3 py-1">
                 View all
               </div>
             </div>

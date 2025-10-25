@@ -54,7 +54,7 @@ const SideNav = () => {
       </div>
 
       <div className="flex flex-col items-center gap-0.5" onClick={hangleLogout}>
-        <div className="rounded-full border border-[#272727] mx-auto hover:bg-[#272727] p-3 content-center">
+        <div className="rounded-full border border-[#272727] mx-auto hover:bg-[#db0202] hover:border-[#db0202] p-3 content-center">
           <LogOut />
         </div>
         <p className="text-[10px]">Logout</p>
