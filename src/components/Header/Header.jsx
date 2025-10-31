@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+
   return (
     <header className="bg-[#0f0f0f] px-6 py-4 flex items-center justify-between sticky top-0 z-50 ">
       <div className="flex items-center gap-6">
@@ -30,7 +31,7 @@ const Header = () => {
       </div>
 
       <div className="flex items-center gap-4">
-        <button className="flex items-center gap-2 border border-[#272727] text-[#EEF0E5] px-4 py-2 rounded-full transition-all transform hover:scale-105">
+        <button className="flex items-center gap-2 border border-[#272727] text-[#EEF0E5] px-4 py-2 rounded-full transition-all transform hover:scale-105" onClick={() => navigate("/upload")}>
           <Upload className="w-4 h-4" />
           <span className="hidden sm:inline">Create</span>
         </button>

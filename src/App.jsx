@@ -146,11 +146,11 @@ function App() {
         
         // Liked Videos can be fetched and dispatched similarly
         data = await axios.get("/api/v1/likes/videos");
-        console.log("liked videos :: ", data.data.data);
+        console.log("liked videos 22 :: ", data);
 
-        allVideos = data.data.data[0].video;
+        allVideos = data.data?.data[0]?.video;
         
-        const likedVideos = allVideos.map((video) => ({
+        const likedVideos = allVideos?.map((video) => ({
           id: video._id,
           title: video.title,
           description: video.description,
@@ -166,17 +166,20 @@ function App() {
         console.log("Formatted Liked Videos :: ", likedVideos);
         dispatch(setLikedVideos(likedVideos));        
 
-        setIsLoading(false);
       } catch (error) {
         console.error("App.jsx :: getWatchHistory :: error ", error);        
       }
     };
     getWatchHistoryAndLikedVideos();
+
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
   }, []);
 
   return (
     <>
-      {isLoading ? <Loading /> : <Outlet />}
+      {isLoading? <Loading/> : <Outlet />}
     </>
   );
 }
