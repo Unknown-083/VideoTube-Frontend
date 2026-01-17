@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Upload, Video, Image, X, FileVideo, CheckCircle, AlertCircle, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import axios from '../utils/axios.js';
 
 const UploadVideoComponent = ({ onCancel }) => {
   const [step, setStep] = useState(1);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadError, setUploadError] = useState(null);
   
   const [formData, setFormData] = useState({
     videoFile: null,
@@ -13,10 +15,7 @@ const UploadVideoComponent = ({ onCancel }) => {
     title: '',
     description: '',
     category: '',
-    tags: '',
-    visibility: 'public',
-    allowComments: true,
-    allowRatings: true
+    isPublished: true
   });
   
   const [errors, setErrors] = useState({});
@@ -25,7 +24,6 @@ const UploadVideoComponent = ({ onCancel }) => {
   const navigate = useNavigate();
 
   const categories = [
-    'All',
     'Music',
     'Gaming',
     'Sports',
@@ -44,10 +42,19 @@ const UploadVideoComponent = ({ onCancel }) => {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked, files } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : type === 'file' ? files[0] : value
-    }));
+    
+    // Handle visibility radio button separately
+    if (name === 'visibility') {
+      setFormData(prev => ({
+        ...prev,
+        isPublished: value === 'true'
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : type === 'file' ? files[0] : value
+      }));
+    }
     
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
@@ -106,6 +113,10 @@ const UploadVideoComponent = ({ onCancel }) => {
     if (!formData.category) {
       newErrors.category = 'Please select a category';
     }
+
+    if (!formData.thumbnail) {
+      newErrors.thumbnail = 'Please upload a thumbnail image';
+    }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -119,38 +130,74 @@ const UploadVideoComponent = ({ onCancel }) => {
     }
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     setIsUploading(true);
+    setUploadError(null);
     
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 10;
-      setUploadProgress(progress);
+    try {
+      const formDataToSend = new FormData();
       
-      if (progress >= 100) {
-        clearInterval(interval);
-        setTimeout(() => {
-          setIsUploading(false);
-          setStep(3);
-        }, 500);
+      // Append video file
+      formDataToSend.append('videoFile', formData.videoFile);
+      
+      // Append thumbnail
+      if (formData.thumbnail) {
+        formDataToSend.append('thumbnail', formData.thumbnail);
       }
-    }, 500);
+      
+      // Append other fields
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('description', formData.description);
+      formDataToSend.append('category', formData.category);
+      formDataToSend.append('isPublished', formData.isPublished);
+      
+      // Get token from localStorage
+      const token = localStorage.getItem('accessToken');
+      
+      const response = await axios.post(
+        '/api/v1/videos/upload-video',
+        formDataToSend,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${token}`
+          },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            setUploadProgress(percentCompleted);
+          }
+        }
+      );
+      
+      if (response.data.success) {
+        setIsUploading(false);
+        setStep(3);
+      }
+      
+    } catch (error) {
+      setIsUploading(false);
+      setUploadError(
+        error.response?.data?.message || 
+        'Failed to upload video. Please try again.'
+      );
+      console.error('Upload error:', error);
+    }
   };
 
   const handleReset = () => {
     setStep(1);
     setUploadProgress(0);
     setIsUploading(false);
+    setUploadError(null);
     setFormData({
       videoFile: null,
       thumbnail: null,
       title: '',
       description: '',
       category: '',
-      tags: '',
-      isPublished: 'public',
-      allowComments: true,
-      allowRatings: true
+      isPublished: true
     });
     setErrors({});
   };
@@ -159,7 +206,6 @@ const UploadVideoComponent = ({ onCancel }) => {
     if (onCancel) {
       onCancel();
     } else {
-      // If no onCancel prop, just reset the form
       handleReset();
       navigate("/");
     }
@@ -172,6 +218,7 @@ const UploadVideoComponent = ({ onCancel }) => {
 
   const removeThumbnail = () => {
     setFormData(prev => ({ ...prev, thumbnail: null }));
+    setErrors(prev => ({ ...prev, thumbnail: '' }));
   };
 
   return (
@@ -326,6 +373,17 @@ const UploadVideoComponent = ({ onCancel }) => {
                 <h2 className="text-xl font-semibold">Video Details</h2>
               </div>
 
+              {/* Error Display */}
+              {uploadError && (
+                <div className="bg-red-500/10 border border-red-500 rounded-lg p-4 flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-red-500 font-medium">Upload Failed</p>
+                    <p className="text-red-400 text-sm mt-1">{uploadError}</p>
+                  </div>
+                </div>
+              )}
+
               {/* Title */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -390,7 +448,11 @@ const UploadVideoComponent = ({ onCancel }) => {
                 {!formData.thumbnail ? (
                   <div
                     onClick={() => document.getElementById('thumbnail-input').click()}
-                    className="border-2 border-dashed border-[#272727] rounded-lg p-8 text-center cursor-pointer hover:border-gray-500 hover:bg-[#1a1a1a] transition-all"
+                    className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:bg-[#1a1a1a] transition-all ${
+                      errors.thumbnail 
+                        ? 'border-red-500' 
+                        : 'border-[#272727] hover:border-gray-500'
+                    }`}
                   >
                     <Image className="w-10 h-10 text-gray-400 mx-auto mb-2" />
                     <p className="text-sm text-gray-400">Click to upload thumbnail</p>
@@ -426,6 +488,9 @@ const UploadVideoComponent = ({ onCancel }) => {
                   onChange={handleInputChange}
                   className="hidden"
                 />
+                {errors.thumbnail && (
+                  <p className="mt-1.5 text-xs text-red-500">{errors.thumbnail}</p>
+                )}
               </div>
 
               {/* Category */}
@@ -452,22 +517,7 @@ const UploadVideoComponent = ({ onCancel }) => {
                   <p className="mt-1.5 text-xs text-red-500">{errors.category}</p>
                 )}
               </div>
-
-              {/* Tags */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Tags (Optional)
-                </label>
-                <input
-                  type="text"
-                  name="tags"
-                  value={formData.tags}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2.5 bg-[#1a1a1a] border border-[#272727] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 transition-all"
-                  placeholder="Separate tags with commas"
-                />
-              </div>
-
+            
               {/* Visibility */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -475,15 +525,15 @@ const UploadVideoComponent = ({ onCancel }) => {
                 </label>
                 <div className="space-y-2">
                   {[
-                    { value: 'public', label: 'Public', desc: 'Everyone can watch', icon: Eye },
-                    { value: 'private', label: 'Private', desc: 'Only you can watch', icon: EyeOff }
+                    { value: 'true', label: 'Public', desc: 'Everyone can watch', icon: Eye },
+                    { value: 'false', label: 'Private', desc: 'Only you can watch', icon: EyeOff }
                   ].map((option) => {
                     const IconComponent = option.icon;
                     return (
                       <label
                         key={option.value}
                         className={`flex items-center gap-3 p-3 bg-[#1a1a1a] rounded-lg cursor-pointer transition-all ${
-                          formData.visibility === option.value 
+                          formData.isPublished === (option.value === 'true')
                             ? 'border border-white' 
                             : 'border border-transparent hover:bg-[#272727]'
                         }`}
@@ -492,7 +542,7 @@ const UploadVideoComponent = ({ onCancel }) => {
                           type="radio"
                           name="visibility"
                           value={option.value}
-                          checked={formData.visibility === option.value}
+                          checked={formData.isPublished === (option.value === 'true')}
                           onChange={handleInputChange}
                           className="w-4 h-4"
                         />
@@ -505,38 +555,7 @@ const UploadVideoComponent = ({ onCancel }) => {
                     );
                   })}
                 </div>
-              </div>
-
-              {/* Settings */}
-              <div className="space-y-2">
-                <label className="flex items-center justify-between p-3 bg-[#1a1a1a] rounded-lg cursor-pointer hover:bg-[#272727] transition-all">
-                  <div>
-                    <p className="text-sm font-medium text-white">Allow Comments</p>
-                    <p className="text-xs text-gray-400">Viewers can comment</p>
-                  </div>
-                  <input
-                    type="checkbox"
-                    name="allowComments"
-                    checked={formData.allowComments}
-                    onChange={handleInputChange}
-                    className="w-4 h-4"
-                  />
-                </label>
-
-                <label className="flex items-center justify-between p-3 bg-[#1a1a1a] rounded-lg cursor-pointer hover:bg-[#272727] transition-all">
-                  <div>
-                    <p className="text-sm font-medium text-white">Allow Ratings</p>
-                    <p className="text-xs text-gray-400">Viewers can like/dislike</p>
-                  </div>
-                  <input
-                    type="checkbox"
-                    name="allowRatings"
-                    checked={formData.allowRatings}
-                    onChange={handleInputChange}
-                    className="w-4 h-4"
-                  />
-                </label>
-              </div>
+              </div>              
 
               {/* Buttons */}
               <div className="flex gap-3 pt-2">

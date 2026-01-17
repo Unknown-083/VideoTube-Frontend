@@ -1,8 +1,7 @@
 import React, { useEffect } from "react";
 import Header from "../components/Header/Header";
-import Videos from "../components/Videos";
 import { Bookmark, Share2, ThumbsDown, ThumbsUp } from "lucide-react";
-import axios from "axios";
+import axios from "../utils/axios.js";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 

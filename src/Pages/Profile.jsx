@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from "react";
 import Header from "../components/Header/Header.jsx";
 import SideNav from "../components/Header/SideNav.jsx";
 import Videos from "../components/Videos";
 import { useSelector } from "react-redux";
-import axios from "axios";
 
 const Profile = () => {
   const user = useSelector((state) => state.auth.userData);
@@ -16,7 +14,7 @@ const Profile = () => {
 
       <div className="flex w-full overflow-hidden">
         <SideNav />
-        <div className="ml-15 p-10 pt-0 w-full">
+        <div className="ml-15 p-10 pt-2 pr-5 w-full overflow-auto">
           {/* User Info */}
           <div className="flex w-full">
             <img
@@ -44,7 +42,7 @@ const Profile = () => {
               </div>
             </div>
             {/* Videos */}
-            <div className="max-w-screen overflow-auto custom-scrollbar">
+            <div className="max-w-screen overflow-auto overflow-x-auto">
               {watchHistory && (
                 <Videos grid={false} videoArray={watchHistory} />
               )}

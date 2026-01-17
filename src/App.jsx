@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import "./App.css";
 import { Outlet, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { login } from "./auth/authSlice";
-import axios from "axios";
+import { login, logout } from "./auth/authSlice";
+import axios from "./utils/axios";
 import { setLikedVideos, setVideos, setWatchHistory } from "./auth/videoSlice.js";
+import { formatVideoData } from "./utils/helpers";
 import Loading from "./components/Loading.jsx";
 
 function App() {
@@ -13,174 +13,129 @@ function App() {
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  function timeAgo(dateString) {
-    const now = new Date();
-    const past = new Date(dateString);
-    const diffInSeconds = Math.floor((now - past) / 1000);
-
-    const intervals = [
-      { label: "year", seconds: 31536000 },
-      { label: "month", seconds: 2592000 },
-      { label: "day", seconds: 86400 },
-      { label: "hour", seconds: 3600 },
-      { label: "minute", seconds: 60 },
-      { label: "second", seconds: 1 },
-    ];
-
-    for (const interval of intervals) {
-      const count = Math.floor(diffInSeconds / interval.seconds);
-      if (count >= 1) {
-        return `${count} ${interval.label}${count > 1 ? "s" : ""} ago`;
-      }
-    }
-
-    return "just now";
-  }
-
-  function formatViews(views) {
-    if (views >= 1e9) {
-      return (views / 1e9).toFixed(1) + "B views";
-    } else if (views >= 1e6) {
-      return (views / 1e6).toFixed(1) + "M views";
-    } else if (views >= 1e3) {
-      return (views / 1e3).toFixed(1) + "K views";
-    } else {
-      return `${views} views`;
-    }
-  }
-
-  function formatDuration(durationInSeconds) {
-    const totalSeconds = Math.floor(durationInSeconds);
-
-    const hours = Math.floor(totalSeconds / 3600);
-    const mins = Math.floor((totalSeconds % 3600) / 60)
-      .toString()
-      .padStart(2, "0");
-    const secs = (totalSeconds % 60).toString().padStart(2, "0");
-
-    if (hours > 0) {
-      return `${hours.toString().padStart(2, "0")}:${mins}:${secs}`;
-    } else {
-      return `${mins}:${secs}`;
-    }
-  }
-
-  // Check if user is logged in
-  useEffect(() => {
-    if (auth.status) {
-      console.log("User is already logged in");
-      return;
-    }
-
-    const getCurentUser = async () => {
-      try {
-        const user = await axios.get("/api/v1/users/get-user");
-
-        if (!user) {
-          navigate("/login");
-        }
-        dispatch(login(user.data.data.data));
-      } catch (error) {
-        console.error("Error fetching current user:", error);
+  // Get current user
+  const getCurrentUser = useCallback(async () => {
+    try {
+      const { data } = await axios.get("/api/v1/users/get-user");
+      
+      if (data?.data?.data) {
+        dispatch(login(data.data.data));
+        return true;
+      } else {
         navigate("/login");
+        return false;
       }
-    };
-    getCurentUser();
-  }, [auth.status, navigate, dispatch]);
+    } catch (error) {
+      console.error("Error fetching current user:", error);
+      dispatch(logout());
+      navigate("/login");
+      return false;
+    }
+  }, [dispatch, navigate]);
 
-  // Fetch videos from server
-  useEffect(() => {
-    const getVideos = async () => {
-      try {
-        const { data } = await axios.get("/api/v1/videos");
-        const allvideos = data.data?.videos;
+  // Fetch all videos
+  const getVideos = useCallback(async () => {
+    try {
+      const { data } = await axios.get("/api/v1/videos");
+      const allVideos = data.data?.videos || [];
 
-        const finalVideos = allvideos.map((video) => ({
-          id: video._id,
-          title: video.title,
-          description: video.description,
-          channel: video.owner.fullname,
-          avatar: video.owner?.avatar?.url || "",
-          videoFile: video.videoFile?.url || "",
-          thumbnail: video.thumbnail?.url || "",
-          views: formatViews(video.views),
-          time: timeAgo(video.createdAt),
-          duration: formatDuration(video.duration),
-        }));
-
-        dispatch(setVideos(finalVideos));
-      } catch (error) {
-        console.error("Error fetching videos:", error);
-      }
-    };
-    getVideos();
+      const formattedVideos = allVideos.map(formatVideoData);
+      dispatch(setVideos(formattedVideos));
+    } catch (error) {
+      console.error("Error fetching videos:", error);
+      setError("Failed to load videos");
+    }
   }, [dispatch]);
 
-  // Fetch watch history and liked videos could be added here similarly
+  // Fetch watch history
+  const getWatchHistory = useCallback(async () => {
+    try {
+      const { data } = await axios.get("/api/v1/users/history");
+      const allVideos = data.data || [];
 
+      const formattedHistory = allVideos.map(formatVideoData);
+      dispatch(setWatchHistory(formattedHistory));
+    } catch (error) {
+      console.error("Error fetching watch history:", error);
+    }
+  }, [dispatch]);
+
+  // Fetch liked videos
+  const getLikedVideos = useCallback(async () => {
+    try {
+      const { data } = await axios.get("/api/v1/likes/videos");
+      const allVideos = data.data?.data?.[0]?.video || [];
+
+      const formattedLiked = allVideos.map(formatVideoData);
+      dispatch(setLikedVideos(formattedLiked));
+    } catch (error) {
+      console.error("Error fetching liked videos:", error);
+    }
+  }, [dispatch]);
+
+  // Initialize app - check auth
   useEffect(() => {
-    const getWatchHistoryAndLikedVideos = async () => {
-      try {
-        // Watch History
-        let { data } = await axios.get("/api/v1/users/history");
-        console.log("watch history :: ", data);
-
-        let allVideos = data.data;
-
-        const watchHistory = allVideos.map((video) => ({
-          id: video._id,
-          title: video.title,
-          description: video.description,
-          channel: video.owner?.fullname,
-          avatar: video.owner?.avatar?.url || "",
-          videoFile: video.videoFile?.url || "",
-          thumbnail: video.thumbnail?.url || "",
-          views: formatViews(video.views),
-          time: timeAgo(video.createdAt),
-          duration: formatDuration(video.duration),
-        }));
-
-        console.log("Formatted Watch History :: ", watchHistory);
-        dispatch(setWatchHistory(watchHistory));
-        
-        // Liked Videos can be fetched and dispatched similarly
-        data = await axios.get("/api/v1/likes/videos");
-        console.log("liked videos 22 :: ", data);
-
-        allVideos = data.data?.data[0]?.video;
-        
-        const likedVideos = allVideos?.map((video) => ({
-          id: video._id,
-          title: video.title,
-          description: video.description,
-          channel: video.owner.fullname,
-          avatar: video.owner?.avatar?.url || "",
-          videoFile: video.videoFile?.url || "",
-          thumbnail: video.thumbnail?.url || "",
-          views: formatViews(video.views),
-          time: timeAgo(video.createdAt),
-          duration: formatDuration(video.duration),
-        }));
-
-        console.log("Formatted Liked Videos :: ", likedVideos);
-        dispatch(setLikedVideos(likedVideos));        
-
-      } catch (error) {
-        console.error("App.jsx :: getWatchHistory :: error ", error);        
+    const initializeApp = async () => {
+      setIsLoading(true);
+      
+      // Check if user is already logged in
+      if (auth.status) {
+        console.log("User is already logged in");
+        setIsLoading(false);
+        return;
       }
-    };
-    getWatchHistoryAndLikedVideos();
 
-    setTimeout(() => {
+      // Try to get current user
+      const isAuthenticated = await getCurrentUser();
+      
+      if (isAuthenticated) {
+        // Load initial data
+        await Promise.all([
+          getVideos(),
+          getWatchHistory(),
+          getLikedVideos()
+        ]);
+      }
+      
       setIsLoading(false);
-    }, 1000);
-  }, []);
+    };
+
+    initializeApp();
+  }, []); // Only run once on mount
+
+  // Fetch videos when auth status changes
+  useEffect(() => {
+    if (auth.status) {
+      getVideos();
+    }
+  }, [auth.status, getVideos]);
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-black text-white">
+        <div className="text-center">
+          <p className="text-red-500 text-xl mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="bg-white text-black px-6 py-2 rounded-lg"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <>
-      {isLoading? <Loading/> : <Outlet />}
-    </>
+    <div className="h-screen">
+      <Outlet />
+    </div>
   );
 }
 
