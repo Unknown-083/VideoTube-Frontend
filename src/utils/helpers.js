@@ -64,3 +64,14 @@ export function formatVideoData(video) {
     duration: formatDuration(video.duration),
   };
 }
+
+export function formatDate(isoString) {
+  const date = new Date(isoString);
+
+  const options = { day: "2-digit", month: "short", year: "numeric" };
+  const [day, month, year] = date
+    .toLocaleDateString("en-GB", options)
+    .split(" ");
+
+  return `${day} ${month}, ${year}`;
+}

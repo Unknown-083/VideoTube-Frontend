@@ -2,48 +2,17 @@ import React, { useEffect } from "react";
 import Header from "../components/Header/Header";
 import { Bookmark, Share2, ThumbsDown, ThumbsUp } from "lucide-react";
 import axios from "../utils/axios.js";
+import { formatViews, timeAgo, formatDate } from "../utils/helpers.js";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import Input from "../components/Input.jsx";
 
 const Video = () => {
-  // const Videos = [
-  //   {
-  //     title: "Video Title",
-  //     views: "1.2M views",
-  //     timestamp: "2 days ago",
-  //     channelImage: "https://via.placeholder.com/36",
-  //     channel: "Channel Name",
-  //     image: "https://via.placeholder.com/210x118",
-  //   },
-  //   {
-  //     title: "Video Title",
-  //     views: "1.2M views",
-  //     timestamp: "2 days ago",
-  //     channelImage: "https://via.placeholder.com/36",
-  //     channel: "Channel Name",
-  //     image: "https://via.placeholder.com/210x118",
-  //   },
-  //   {
-  //     title: "Video Title",
-  //     views: "1.2M views",
-  //     timestamp: "2 days ago",
-  //     channelImage: "https://via.placeholder.com/36",
-  //     channel: "Channel Name",
-  //     image: "https://via.placeholder.com/210x118",
-  //   },
-  //   {
-  //     title: "Video Title",
-  //     views: "1.2M views",
-  //     timestamp: "2 days ago",
-  //     channelImage: "https://via.placeholder.com/36",
-  //     channel: "Channel Name",
-  //     image: "https://via.placeholder.com/210x118",
-  //   },
-  // ];
-
   const videos = useSelector((state) => state.video.videos);
   const [video, setVideo] = React.useState(null);
+  const [comment, setComment] = React.useState("");
   const [comments, setComments] = React.useState(null);
+  const [isInputFocused, setIsInputFocused] = React.useState(false);
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.userData);
 
@@ -56,7 +25,7 @@ const Video = () => {
       } catch (error) {
         console.error(
           "Video :: getVideoDetails :: Error fetching video details:",
-          error
+          error,
         );
       }
     };
@@ -71,54 +40,55 @@ const Video = () => {
       setComments(data.data);
     };
     getComments();
-  }, []);
+  }, [id]);
 
-  function formatViews(views) {
-    if (views >= 1e9) {
-      return (views / 1e9).toFixed(1) + "B views";
-    } else if (views >= 1e6) {
-      return (views / 1e6).toFixed(1) + "M views";
-    } else if (views >= 1e3) {
-      return (views / 1e3).toFixed(1) + "K views";
-    } else {
-      return `${views} views`;
+  const addComment = async () => {
+    try {
+      const { data } = await axios.post(`/api/v1/comments/${id}`, {
+        content: comment,
+      });
+      console.log(data);
+
+      setComments((prev) => ({
+        ...prev,
+        comments: [data.data, ...prev.comments],
+        totalComments: prev.totalComments + 1,
+      }));
+      setComment("");
+    } catch (error) {
+      console.error("Video :: addComment :: Error adding comment:", error);
     }
-  }
+  };
 
-  function formatDate(isoString) {
-    const date = new Date(isoString);
+  const toggleCommentLike = async (commentId) => {
+    try {
+      const { data } = await axios.post(`api/v1/likes/toggle/c/${commentId}`);
+      console.log("like comment response:", data);
 
-    const options = { day: "2-digit", month: "short", year: "numeric" };
-    const [day, month, year] = date
-      .toLocaleDateString("en-GB", options)
-      .split(" ");
-
-    return `${day} ${month}, ${year}`;
-  }
-
-  function timeAgo(dateString) {
-    const now = new Date();
-    const past = new Date(dateString);
-    const diffInSeconds = Math.floor((now - past) / 1000);
-
-    const intervals = [
-      { label: "year", seconds: 31536000 },
-      { label: "month", seconds: 2592000 },
-      { label: "day", seconds: 86400 },
-      { label: "hour", seconds: 3600 },
-      { label: "minute", seconds: 60 },
-      { label: "second", seconds: 1 },
-    ];
-
-    for (const interval of intervals) {
-      const count = Math.floor(diffInSeconds / interval.seconds);
-      if (count >= 1) {
-        return `${count} ${interval.label}${count > 1 ? "s" : ""} ago`;
-      }
+      // Toggle hasLiked and update likesCount
+      setComments((prev) => ({
+        ...prev,
+        comments: prev.comments.map((comment) => {
+          if (comment._id === commentId) {
+            const newHasLiked = !comment.hasLiked;
+            return {
+              ...comment,
+              hasLiked: newHasLiked,
+              likesCount: newHasLiked
+                ? comment.likesCount + 1
+                : comment.likesCount - 1,
+            };
+          }
+          return comment;
+        }),
+      }));
+    } catch (error) {
+      console.error(
+        "Video :: toggleCommentLike :: Error liking comment:",
+        error,
+      );
     }
-
-    return "just now";
-  }
+  };
 
   return (
     <div>
@@ -196,34 +166,53 @@ const Video = () => {
             </div>
 
             {/* Comments */}
-            <div className="">
+            <div className="w-full">
               <h1 className="text-xl font-bold py-4">
                 {comments?.totalComments} Comments
               </h1>
 
-              <div className="flex gap-4 items-center">
+              <div className="w-full flex gap-4 items-center">
                 <img
                   src={user?.avatar?.url}
                   alt="avatar"
                   className="rounded-full w-10 h-10"
                 />
-                <input
-                  type="text"
-                  placeholder="Add a comment"
-                  className="border-b-1 border-[#272727] text-sm w-full pb-1"
+                <Input
+                  className="border-b-1 border-[#272727] text-sm w-full pb-1 focus:outline-none bg-transparent focus:border-b-white"
+                  value={comment}
+                  placeholder="Add a comment..."
+                  onChange={(e) => setComment(e.target.value)}
+                  onFocus={() => setIsInputFocused(true)}
+                  onBlur={() => setIsInputFocused(false)}
                 />
+                <button
+                  name="comment"
+                  className={`text-sm px-2 py-1 rounded-full transition-colors ${
+                    isInputFocused
+                      ? "bg-white text-black font-medium"
+                      : "bg-[#272727]"
+                  }`}
+                  disabled={!comment.trim()}
+                  onClick={addComment}
+                >
+                  Add
+                </button>
               </div>
 
               <div className="flex flex-col gap-4 mt-4">
                 {comments &&
                   comments.comments.map((comment) => (
                     <div key={comment?._id} className="flex">
-                      <img src="" alt="" className="rounded-full w-10 h-10" />
+                      <img
+                        src={comment?.owner?.avatar?.url || user?.avatar?.url}
+                        alt=""
+                        className="rounded-full w-10 h-10"
+                      />
 
                       <div className="ml-4">
                         <div className="flex">
                           <p className="text-sm">
-                            @{comment?.owner?.username}
+                            @{comment?.owner?.username || user?.username} •
                             <span className="ml-1 text-gray-500 text-xs">
                               {timeAgo(comment?.createdAt)}
                             </span>
@@ -231,6 +220,18 @@ const Video = () => {
                         </div>
 
                         <h3 className="text-md">{comment?.content}</h3>
+
+                        <div className="flex gap-1 items-center">
+                          <ThumbsUp
+                            className={`w-4 cursor-pointer transition-colors ${
+                              comment?.hasLiked
+                                ? "text-white fill-white"
+                                : "text-gray-500 hover:text-white"
+                            }`}
+                            onClick={() => toggleCommentLike(comment?._id)}
+                          />
+                          <span className="text-xs">{comment?.likesCount}</span>
+                        </div>
                       </div>
                     </div>
                   ))}

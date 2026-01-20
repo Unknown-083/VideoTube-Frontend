@@ -13,7 +13,7 @@ const Input = ({
   const id = useId();
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col w-full">
       {label && <label htmlFor={id} className="text-sm mb-1">{label}</label>}
       <input
         type={type}

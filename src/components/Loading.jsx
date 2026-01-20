@@ -2,7 +2,7 @@ import React from "react";
 
 const Loading = () => {
   return (
-    <div className="h-full flex justify-center items-center gap-4">
+    <div className="h-screen flex justify-center items-center gap-4">
       <div className="relative w-16 h-16">
         <div className="absolute inset-0 bg-purple-500 rounded-full animate-ping" />
         <div className="absolute inset-0 bg-purple-600 rounded-full" />
