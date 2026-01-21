@@ -16,8 +16,6 @@ const Videos = ({ grid = true, videoArray = null }) => {
     } else {
       setVideos(localVideos);
     }
-
-    console.log("Videos component - videos:", videos);
   }, [videoArray, localVideos]);
 
   // Loading state

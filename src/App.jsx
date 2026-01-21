@@ -66,9 +66,12 @@ function App() {
   const getLikedVideos = useCallback(async () => {
     try {
       const { data } = await axios.get("/api/v1/likes/videos");
-      const allVideos = data.data?.data?.[0]?.video || [];
-
+      const allVideos = data.data || [];
+      console.log(data.data);
+      
       const formattedLiked = allVideos.map(formatVideoData);
+      console.log("Formatted videos :: ", formattedLiked);
+      
       dispatch(setLikedVideos(formattedLiked));
     } catch (error) {
       console.error("Error fetching liked videos:", error);

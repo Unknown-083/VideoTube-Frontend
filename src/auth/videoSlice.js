@@ -50,7 +50,6 @@ const videoSlice = createSlice({
   },
   reducers: {
     setVideos: (state, action) => {
-      console.log("action.payload", action.payload);
       state.videos = action.payload
     },
     setWatchHistory: (state, action) => {

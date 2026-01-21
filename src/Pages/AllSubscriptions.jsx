@@ -1,8 +1,26 @@
-import React from "react";
+import React, { useEffect } from "react";
+import axios from "../utils/axios.js";
 import Header from "../components/Header/Header.jsx";
 import SideNav from "../components/Header/SideNav.jsx";
 
+// const [subscriptions, setSubscriptions] = React.useState([]);
+
 const AllSubscriptions = () => {
+  useEffect(() => {
+    const fetchSubscriptions = async () => {
+      try {
+        const response = await axios.get("/api/v1/subscriptions");
+        console.log(response);
+
+        // setSubscriptions(response.data.data || []);
+      } catch (error) {
+        console.error("Error fetching subscriptions:", error);
+      }
+    };
+
+    fetchSubscriptions();
+  }, []);
+
   return (
     <div className="min-h-screen text-white">
       <Header />

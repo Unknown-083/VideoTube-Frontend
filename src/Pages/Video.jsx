@@ -21,6 +21,7 @@ const Video = () => {
     const getVideoDetails = async () => {
       try {
         const { data } = await axios.get(`/api/v1/videos/${id}`);
+        console.log("video details ", data.data);
         setVideo(data.data);
       } catch (error) {
         console.error(
@@ -90,6 +91,49 @@ const Video = () => {
     }
   };
 
+  const toggleVideoLike = async () => {
+    try {
+      const { data } = await axios.post(`api/v1/likes/toggle/v/${id}`);
+      console.log("like video response:", data);
+      // Update video likesCount
+      setVideo((prev) => {
+        const newHasLiked = !prev.hasLiked;
+        return {
+          ...prev,
+          hasLiked: newHasLiked,
+          likesCount: newHasLiked ? prev.likesCount + 1 : prev.likesCount - 1,
+        };
+      });
+    } catch (error) {
+      console.error("Video :: toggleVideoLike :: Error liking video:", error);
+    }
+  };
+
+  const toggleSubscribe = async () => {
+    try {
+      const { data } = await axios.get(
+        `api/v1/subscriptions/toggle/${video?.owner?._id}`,
+      );
+      console.log("subscribe response:", data);
+      setVideo((prev) => ({
+        ...prev,
+        owner: {
+          ...prev.owner,
+          isSubscribed: !prev.owner.isSubscribed,
+          subscribersCount: prev.owner.isSubscribed
+            ? prev.owner.subscribersCount - 1
+            : prev.owner.subscribersCount + 1,
+            
+        },
+      }));
+    } catch (error) {
+      console.error(
+        "Video :: toggleSubscribe :: Error toggling subscription:",
+        error,
+      );
+    }
+  };
+
   return (
     <div>
       <Header />
@@ -133,14 +177,30 @@ const Video = () => {
                       {video?.owner?.subscribersCount || "0"} subscribers
                     </p>
                   </div>
-                  <div className="mt-1 rounded-full font-medium p-1.5 px-4 bg-white text-black">
-                    Subscribe
+                  <div
+                    className={`mt-1 w-25 rounded-full font-medium py-1.5 text-black flex items-center justify-center ${
+                      video?.owner?.isSubscribed
+                        ? "bg-[#272727] text-white"
+                        : "bg-white"
+                    } cursor-pointer px-4`}
+                    onClick={toggleSubscribe}
+                  >
+                    <p className="self-center">
+                      {video?.owner?.isSubscribed ? "Subscribed" : "Subscribe"}
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex gap-2 items-center text-sm">
                   <div className="rounded-full items-center p-1.5 px-4 bg-[#272727] flex gap-1 cursor-pointer hover:text-white">
-                    <ThumbsUp className="p-0.5" />{" "}
+                    <ThumbsUp
+                      className={`p-0.5 ${
+                        video?.hasLiked
+                          ? "text-white fill-white"
+                          : "hover:text-white"
+                      }`}
+                      onClick={toggleVideoLike}
+                    />{" "}
                     <span className="pr-3 font-medium border-r border-r-gray-400">
                       {video?.likesCount}
                     </span>
@@ -226,7 +286,7 @@ const Video = () => {
                             className={`w-4 cursor-pointer transition-colors ${
                               comment?.hasLiked
                                 ? "text-white fill-white"
-                                : "text-gray-500 hover:text-white"
+                                : "hover:text-white"
                             }`}
                             onClick={() => toggleCommentLike(comment?._id)}
                           />

@@ -75,7 +75,7 @@ const Profile = () => {
             </div>
             {/* Videos */}
             <div className="max-w-screen overflow-auto custom-scrollbar">
-              <Videos grid={false} />
+              <Videos grid={false}/>
             </div>
           </div>
 
@@ -84,7 +84,7 @@ const Profile = () => {
             <div className="flex justify-between items-center mb-3">
               <div className="flex flex-col">
                 <h2 className="text-2xl font-bold">Liked Videos</h2>
-                <p className="text-xs text-gray-400">100 Videos</p>
+                <p className="text-xs text-gray-400">{likedVideos?.length || 0} Videos</p>
               </div>
               <div className="rounded-full border h-fit border-[#272727] px-3 py-1">
                 View all
