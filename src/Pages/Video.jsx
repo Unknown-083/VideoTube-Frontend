@@ -6,6 +6,7 @@ import { formatViews, timeAgo, formatDate } from "../utils/helpers.js";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import Input from "../components/Input.jsx";
+import { toggleVideoLike, toggleSubscribe } from "../utils/toggleLikeSubscribe.js";
 
 const Video = () => {
   const videos = useSelector((state) => state.video.videos);
@@ -91,49 +92,6 @@ const Video = () => {
     }
   };
 
-  const toggleVideoLike = async () => {
-    try {
-      const { data } = await axios.post(`api/v1/likes/toggle/v/${id}`);
-      console.log("like video response:", data);
-      // Update video likesCount
-      setVideo((prev) => {
-        const newHasLiked = !prev.hasLiked;
-        return {
-          ...prev,
-          hasLiked: newHasLiked,
-          likesCount: newHasLiked ? prev.likesCount + 1 : prev.likesCount - 1,
-        };
-      });
-    } catch (error) {
-      console.error("Video :: toggleVideoLike :: Error liking video:", error);
-    }
-  };
-
-  const toggleSubscribe = async () => {
-    try {
-      const { data } = await axios.get(
-        `api/v1/subscriptions/toggle/${video?.owner?._id}`,
-      );
-      console.log("subscribe response:", data);
-      setVideo((prev) => ({
-        ...prev,
-        owner: {
-          ...prev.owner,
-          isSubscribed: !prev.owner.isSubscribed,
-          subscribersCount: prev.owner.isSubscribed
-            ? prev.owner.subscribersCount - 1
-            : prev.owner.subscribersCount + 1,
-            
-        },
-      }));
-    } catch (error) {
-      console.error(
-        "Video :: toggleSubscribe :: Error toggling subscription:",
-        error,
-      );
-    }
-  };
-
   return (
     <div>
       <Header />
@@ -183,7 +141,7 @@ const Video = () => {
                         ? "bg-[#272727] text-white"
                         : "bg-white"
                     } cursor-pointer px-4`}
-                    onClick={toggleSubscribe}
+                    onClick={() => toggleSubscribe({ channelId: video?.owner?._id, setVideo })}
                   >
                     <p className="self-center">
                       {video?.owner?.isSubscribed ? "Subscribed" : "Subscribe"}
@@ -199,7 +157,7 @@ const Video = () => {
                           ? "text-white fill-white"
                           : "hover:text-white"
                       }`}
-                      onClick={toggleVideoLike}
+                      onClick={() => toggleVideoLike(id, setVideo)}
                     />{" "}
                     <span className="pr-3 font-medium border-r border-r-gray-400">
                       {video?.likesCount}
@@ -306,14 +264,14 @@ const Video = () => {
             <div
               onClick={() => navigate(`/video/${video.id}`)}
               key={index}
-              className="flex mb-4 cursor-pointer"
+              className="flex w-full mb-4 cursor-pointer"
             >
               <img
                 src={video.avatar}
                 alt={video.title}
-                className="w-40 h-24 rounded-lg bg-gray-500 mr-4"
+                className="w-[40%] h-24 rounded-lg bg-gray-500 mr-4"
               />
-              <div>
+              <div className="w-[60%]">
                 <h3 className="text-lg font-semibold text-white">
                   {video.title}
                 </h3>
