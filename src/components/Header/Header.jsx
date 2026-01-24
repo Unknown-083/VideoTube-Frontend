@@ -8,7 +8,7 @@ const Header = () => {
   const navigate = useNavigate();
 
   return (
-    <header className="bg-[#0f0f0f] px-6 py-4 flex items-center justify-between sticky top-0 z-50 ">
+    <header className="backdrop-blur-md px-6 py-4 flex items-center justify-between sticky top-0 z-50 ">
       <div className="flex items-center gap-6">
         <Menu className="w-6 h-6 font-extralight cursor-pointer hover:text-gray-300 transition-colors" />
         <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate("/")}>

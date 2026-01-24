@@ -125,6 +125,7 @@ const Video = () => {
                 style={{
                   backgroundImage: `url(${video?.owner?.avatar.url || "#"})`,
                 }}
+                onClick={() => navigate(`/channel/${video?.owner?._id}`)}
               ></div>
 
               <div className="w-full flex justify-between">

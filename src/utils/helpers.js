@@ -56,6 +56,7 @@ export function formatVideoData(video) {
     title: video.title,
     description: video.description,
     channel: video.owner?.fullname || "Unknown",
+    channelId: video.owner?._id || "",
     avatar: video.owner?.avatar?.url || "",
     videoFile: video.videoFile?.url || "",
     thumbnail: video.thumbnail?.url || "",

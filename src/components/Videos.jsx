@@ -30,8 +30,12 @@ const Videos = ({ grid = true, videoArray = null }) => {
         <div className="w-20 h-20 bg-[#272727] rounded-full flex items-center justify-center mb-4">
           <AlertCircle className="w-10 h-10 text-gray-400" />
         </div>
-        <h3 className="text-xl font-semibold text-white mb-2">No Videos Available</h3>
-        <p className="text-gray-400 text-sm">Check back later for new content</p>
+        <h3 className="text-xl font-semibold text-white mb-2">
+          No Videos Available
+        </h3>
+        <p className="text-gray-400 text-sm">
+          Check back later for new content
+        </p>
       </div>
     );
   }
@@ -47,14 +51,14 @@ const Videos = ({ grid = true, videoArray = null }) => {
       {videos.map((video) => (
         <div
           key={video.id}
-          className={`group cursor-pointer ${!grid ? "w-80 flex-shrink-0" : ""}`}
-          onClick={() => navigate(`/video/${video.id}`)}
+          className={`group ${!grid ? "w-80 flex-shrink-0" : ""}`}
         >
           {/* Thumbnail */}
           <div
-            className={`relative aspect-video rounded-xl overflow-hidden mb-3 ${
+            className={`relative cursor-pointer aspect-video rounded-xl overflow-hidden mb-3 ${
               grid ? "" : "w-80"
             }`}
+            onClick={() => navigate(`/video/${video.id}`)}
           >
             {/* Thumbnail Image */}
             <img
@@ -62,7 +66,8 @@ const Videos = ({ grid = true, videoArray = null }) => {
               alt={video.title}
               className="object-cover w-full h-full bg-black"
               onError={(e) => {
-                e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzMzMzMzMyIvPjwvc3ZnPg==';
+                e.target.src =
+                  "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzMzMzMzMyIvPjwvc3ZnPg==";
               }}
             />
 
@@ -81,14 +86,15 @@ const Videos = ({ grid = true, videoArray = null }) => {
           <div className="flex gap-3">
             {/* Avatar */}
             <div
-              className="w-9 h-9 bg-gradient-to-br from-teal-600 to-green-800 rounded-full flex items-center justify-center flex-shrink-0 bg-cover bg-center"
+              className="w-9 h-9 bg-gradient-to-br from-teal-600 to-green-800 rounded-full flex items-center justify-center flex-shrink-0 bg-cover bg-center cursor-pointer"
               style={{
-                backgroundImage: video.avatar ? `url(${video.avatar})` : 'none',
+                backgroundImage: video.avatar ? `url(${video.avatar})` : "none",
               }}
+              onClick={() => navigate(`/channel/${video?.channelId}`)}
             >
               {!video.avatar && (
                 <span className="text-white font-semibold text-sm">
-                  {video.channel?.charAt(0)?.toUpperCase() || '?'}
+                  {video.channel?.charAt(0)?.toUpperCase() || "?"}
                 </span>
               )}
             </div>
@@ -98,7 +104,10 @@ const Videos = ({ grid = true, videoArray = null }) => {
                 {video.title}
               </h3>
 
-              <p className="text-sm text-gray-400 hover:text-white cursor-pointer transition-colors mb-1">
+              <p
+                className="text-sm text-gray-400 hover:text-white cursor-pointer transition-colors mb-1"
+                onClick={() => navigate(`/channel/${video.channelId}`)}
+              >
                 {video.channel}
               </p>
 

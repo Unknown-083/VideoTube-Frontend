@@ -18,6 +18,7 @@ import Signup from "./Pages/Signup.jsx";
 import { Provider } from "react-redux";
 import {store} from "./auth/store.js";
 import UploadVideo from "./Pages/UploadVideo.jsx";
+import Channel from "./Pages/Channel.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -30,6 +31,7 @@ const router = createBrowserRouter(
       <Route path="login" element={<Login />} />
       <Route path="signup" element={<Signup />} />
       <Route path="upload" element={<UploadVideo />} />
+      <Route path="channel/:id" element={<Channel />} />
     </Route>,
   ])
 );
