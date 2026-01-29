@@ -5,6 +5,7 @@ import SideNav from "../components/Header/SideNav.jsx";
 import { useSelector } from "react-redux";
 import { toggleSubscribe } from "../utils/toggleLikeSubscribe.js";
 import { useNavigate } from "react-router-dom";
+import { fetchSubscriptions } from "../utils/getSubscriptions.js";
 
 const AllSubscriptions = () => {
   const [subscriptions, setSubscriptions] = useState([]);
@@ -13,26 +14,7 @@ const AllSubscriptions = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchSubscriptions = async () => {
-      try {
-        const { data } = await axios.get(
-          `/api/v1/subscriptions/get-subscribed-channels/${user._id}`,
-        );
-        console.log(data.data);
-
-        setSubscriptions(data.data || []);
-        // Initialize all as subscribed (since these are the user's subscriptions)
-        const initialState = {};
-        data.data?.forEach((sub) => {
-          initialState[sub._id] = true;
-        });
-        setSubscribedState(initialState);
-      } catch (error) {
-        console.error("Error fetching subscriptions:", error);
-      }
-    };
-
-    fetchSubscriptions();
+    fetchSubscriptions({ id: user._id, setSubscriptions, setSubscribedState });
   }, [user._id]);
 
   const handleSubscribe = async (subscription) => {

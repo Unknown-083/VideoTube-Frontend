@@ -28,7 +28,8 @@ const Channel = () => {
       try {
         const { data } = await axios.get(`api/v1/users/c/${id}`);
         // Process the response data as needed
-        console.log("Channel data:", data.data.videos);
+        console.log(data.data);
+        
         setChannelData(data.data);
         setIsSubscribed(data.data.isSubscribed);
         setVideos(data.data.videos.map(formatVideoData));
@@ -163,7 +164,7 @@ const Channel = () => {
   ];
 
   const handleSubscribe = async (id) => {
-    await toggleSubscribe(id);
+    await toggleSubscribe({ channelId: id });
     setIsSubscribed(!isSubscribed);
 
     const newSubscribersCount = isSubscribed
@@ -219,7 +220,7 @@ const Channel = () => {
             <div className="flex gap-2 w-full md:w-auto">
               <button
                 onClick={() => {
-                  handleSubscribe(channelData.id);
+                  handleSubscribe(channelData._id);
                 }}
                 className={`flex-1 md:flex-none px-6 py-2 rounded-full font-medium transition-all ${
                   isSubscribed

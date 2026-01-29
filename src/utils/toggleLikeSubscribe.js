@@ -1,9 +1,8 @@
-import axios from "./axios.js";
+import axios from "../utils/axios.js";
 
 export const toggleVideoLike = async (id, setVideo) => {
     try {
-        const { data } = await axios.post(`/api/v1/likes/toggle/v/${id}`);
-        console.log("like video response:", data);
+        await axios.post(`/api/v1/likes/toggle/v/${id}`);
         // Update video likesCount
         setVideo && setVideo((prev) => {
             const newHasLiked = !prev.hasLiked;
@@ -26,10 +25,9 @@ export const toggleSubscribe = async ({ channelId, setVideo } = {}) => {
             return;
         }
 
-        const { data } = await axios.get(
+        await axios.get(
             `api/v1/subscriptions/toggle/${channelId}`,
         );
-        console.log("subscribe response:", data);
         
         // Only update state if setVideo is provided
         setVideo && setVideo((prev) => ({

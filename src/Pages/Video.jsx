@@ -22,7 +22,6 @@ const Video = () => {
     const getVideoDetails = async () => {
       try {
         const { data } = await axios.get(`/api/v1/videos/${id}`);
-        console.log("video details ", data.data);
         setVideo(data.data);
       } catch (error) {
         console.error(
@@ -38,7 +37,6 @@ const Video = () => {
     const getComments = async () => {
       const { data } = await axios.get(`/api/v1/comments/${id}`);
 
-      console.log("comments ", data.data);
       setComments(data.data);
     };
     getComments();
@@ -49,7 +47,6 @@ const Video = () => {
       const { data } = await axios.post(`/api/v1/comments/${id}`, {
         content: comment,
       });
-      console.log(data);
 
       setComments((prev) => ({
         ...prev,
@@ -65,8 +62,7 @@ const Video = () => {
   const toggleCommentLike = async (commentId) => {
     try {
       const { data } = await axios.post(`api/v1/likes/toggle/c/${commentId}`);
-      console.log("like comment response:", data);
-
+      
       // Toggle hasLiked and update likesCount
       setComments((prev) => ({
         ...prev,

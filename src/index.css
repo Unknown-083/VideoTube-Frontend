@@ -56,3 +56,27 @@ body{
   scrollbar-width: thin;
   scrollbar-color: #272727 #0f0f0f;
 }
+
+@keyframes slide-in {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out forwards;
+}
+@keyframes slide-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+.animate-slide-out {
+  animation: slide-out 0.3s ease-out forwards;
+}

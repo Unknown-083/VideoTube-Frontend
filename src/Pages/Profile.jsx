@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-import axios from "../utils/axios";
 import Header from "../components/Header/Header.jsx";
 import SideNav from "../components/Header/SideNav.jsx";
 import Videos from "../components/Videos";

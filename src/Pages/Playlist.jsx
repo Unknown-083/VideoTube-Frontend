@@ -22,7 +22,6 @@ const Playlist = () => {
     const fetchPlaylistData = async () => {
       // Fetch playlist data based on ID from params
       const { data } = await axios.get(`/api/v1/playlists/${id}`);
-      console.log(data.data);
       setPlaylistData(data.data);
     };
 
@@ -36,11 +35,9 @@ const Playlist = () => {
     const fetchVideos = async () => {
       // Fetch videos logic here
       let { data } = await axios.get("/api/v1/videos");
-      console.log("All Videos:", data.data);
       setAllVideos(data.data.videos);
 
       data = await axios.get(`/api/v1/users/c/${user._id}`);
-      console.log("Users Videos: ", data.data.data.videos);
       setUserVideos(data.data.data.videos);
     };
 
@@ -50,7 +47,6 @@ const Playlist = () => {
   const handleEditPlaylist = async (e) => {
     e.preventDefault();
     // Handle playlist edit logic here
-    console.log("Playlist edited:", playlistData);
     const { data } = await axios.patch(`/api/v1/playlists/${id}`, {
       name: playlistData.name,
       description: playlistData.description,
@@ -63,7 +59,6 @@ const Playlist = () => {
 
   const handleAddVideosToPlaylist = async () => {
     // Handle adding selected videos to the playlist
-    console.log("Videos to add:", selectedVideos);
 
     selectedVideos.map(async (videoId) => {
       const { data } = await axios.patch(`/api/v1/playlists/add-video/${id}`, {
