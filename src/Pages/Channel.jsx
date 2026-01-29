@@ -163,7 +163,7 @@ const Channel = () => {
   ];
 
   const handleSubscribe = async (id) => {
-    toggleSubscribe(id);
+    await toggleSubscribe(id);
     setIsSubscribed(!isSubscribed);
 
     const newSubscribersCount = isSubscribed

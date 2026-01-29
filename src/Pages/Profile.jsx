@@ -1,13 +1,18 @@
+import { useEffect, useState } from "react";
+import axios from "../utils/axios";
 import Header from "../components/Header/Header.jsx";
 import SideNav from "../components/Header/SideNav.jsx";
 import Videos from "../components/Videos";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import Playlists from "../components/Playlists.jsx";
 
 const Profile = () => {
   const user = useSelector((state) => state.auth.userData);
-  const {watchHistory} = useSelector((state) => state.video);
-  const {likedVideos} = useSelector((state) => state.video);  
-
+  const { watchHistory } = useSelector((state) => state.video);
+  const { likedVideos } = useSelector((state) => state.video);
+  const navigate = useNavigate();
+  
   return (
     <div className="min-h-screen">
       <Header />
@@ -28,7 +33,12 @@ const Profile = () => {
               <div className="text-md text-gray-400 flex items-center gap-1 mb-2">
                 <span>{user?.username}</span>
                 <span>•</span>
-                <span className="cursor-pointer">View channel</span>
+                <span
+                  className="cursor-pointer"
+                  onClick={() => navigate(`/channel/${user?._id}`)}
+                >
+                  View channel
+                </span>
               </div>
             </div>
           </div>
@@ -54,12 +64,17 @@ const Profile = () => {
           <div className="mt-8">
             <div className="flex justify-between mb-3">
               <h2 className="text-2xl font-bold">Playlists</h2>
-              <div className="rounded-full border border-[#272727] px-3 py-1">
+              <div
+                className="rounded-full cursor-pointer border border-[#272727] px-3 py-1"
+                onClick={() => navigate("/playlists")}
+              >
                 View all
               </div>
             </div>
             {/* Playlist comp */}
-            <div className="max-w-screen overflow-auto custom-scrollbar"></div>
+            <div className="max-w-screen overflow-auto custom-scrollbar">
+              <Playlists />
+            </div>
           </div>
 
           {/* Watch Later */}
@@ -75,7 +90,7 @@ const Profile = () => {
             </div>
             {/* Videos */}
             <div className="max-w-screen overflow-auto custom-scrollbar">
-              <Videos grid={false}/>
+              <Videos grid={false} />
             </div>
           </div>
 
@@ -84,7 +99,9 @@ const Profile = () => {
             <div className="flex justify-between items-center mb-3">
               <div className="flex flex-col">
                 <h2 className="text-2xl font-bold">Liked Videos</h2>
-                <p className="text-xs text-gray-400">{likedVideos?.length || 0} Videos</p>
+                <p className="text-xs text-gray-400">
+                  {likedVideos?.length || 0} Videos
+                </p>
               </div>
               <div className="rounded-full border h-fit border-[#272727] px-3 py-1">
                 View all

@@ -98,7 +98,7 @@ function App() {
         await Promise.all([
           getVideos(),
           getWatchHistory(),
-          getLikedVideos()
+          getLikedVideos(),
         ]);
       }
       
@@ -112,6 +112,8 @@ function App() {
   useEffect(() => {
     if (auth.status) {
       getVideos();
+      getWatchHistory();
+      getLikedVideos();
     }
   }, [auth.status, getVideos]);
 

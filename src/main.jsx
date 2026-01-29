@@ -19,6 +19,8 @@ import { Provider } from "react-redux";
 import {store} from "./auth/store.js";
 import UploadVideo from "./Pages/UploadVideo.jsx";
 import Channel from "./Pages/Channel.jsx";
+import AllPlaylists from "./Pages/AllPlaylists.jsx";
+import Playlist from "./Pages/Playlist.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements([
@@ -32,6 +34,8 @@ const router = createBrowserRouter(
       <Route path="signup" element={<Signup />} />
       <Route path="upload" element={<UploadVideo />} />
       <Route path="channel/:id" element={<Channel />} />
+      <Route path="playlists" element={<AllPlaylists />} />
+      <Route path="playlists/:id" element={<Playlist />} />
     </Route>,
   ])
 );

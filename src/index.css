@@ -31,3 +31,28 @@ body{
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Dark themed scrollbar */
+.dark-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.dark-scrollbar::-webkit-scrollbar-track {
+  background: #0f0f0f;
+}
+
+.dark-scrollbar::-webkit-scrollbar-thumb {
+  background: #272727;
+  border-radius: 6px;
+}
+
+.dark-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #3a3a3a;
+}
+
+/* Firefox */
+.dark-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #272727 #0f0f0f;
+}
