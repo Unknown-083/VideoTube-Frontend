@@ -1,12 +1,22 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import Header from "../components/Header/Header";
-import { Bookmark, Share2, ThumbsDown, ThumbsUp } from "lucide-react";
+import {
+  Bookmark,
+  Maximize,
+  Minimize,
+  Share2,
+  ThumbsDown,
+  ThumbsUp,
+} from "lucide-react";
 import axios from "../utils/axios.js";
 import { formatViews, timeAgo, formatDate } from "../utils/helpers.js";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import Input from "../components/Input.jsx";
-import { toggleVideoLike, toggleSubscribe } from "../utils/toggleLikeSubscribe.js";
+import {
+  toggleVideoLike,
+  toggleSubscribe,
+} from "../utils/toggleLikeSubscribe.js";
 
 const Video = () => {
   const videos = useSelector((state) => state.video.videos);
@@ -14,8 +24,10 @@ const Video = () => {
   const [comment, setComment] = React.useState("");
   const [comments, setComments] = React.useState(null);
   const [isInputFocused, setIsInputFocused] = React.useState(false);
+  const [isFullscreen, setIsFullscreen] = React.useState(false);
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.userData);
+  const videoRef = useRef(null);
 
   const { id } = useParams();
   useEffect(() => {
@@ -42,6 +54,32 @@ const Video = () => {
     getComments();
   }, [id]);
 
+  useEffect(() => {
+    const onFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    return () =>
+      document.removeEventListener("fullscreenchange", onFullscreenChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    const el = videoRef.current;
+    if (!el) return;
+
+    // Enter fullscreen
+    if (!document.fullscreenElement) {
+      el.requestFullscreen().catch((err) => {
+        console.error("Fullscreen failed:", err);
+      });
+    }
+    // Exit fullscreen
+    else {
+      document.exitFullscreen();
+    }
+  };
+
   const addComment = async () => {
     try {
       const { data } = await axios.post(`/api/v1/comments/${id}`, {
@@ -62,7 +100,7 @@ const Video = () => {
   const toggleCommentLike = async (commentId) => {
     try {
       const { data } = await axios.post(`api/v1/likes/toggle/c/${commentId}`);
-      
+
       // Toggle hasLiked and update likesCount
       setComments((prev) => ({
         ...prev,
@@ -95,15 +133,17 @@ const Video = () => {
       <div className="flex p-3 px-6 gap-5">
         {/* Video */}
         <div className="w-[60%]">
-          <div className="h-80 rounded-2xl bg-cover bg-center">
+          <div className="relative h-80 rounded-2xl bg-black bg-center">
             <video
+              ref={videoRef}
               src={video?.videoFile.url}
               poster={video?.thumbnail.url}
               controls
               autoPlay
               playsInline
               controlsList="nodownload"
-              className="h-full w-full rounded-xl inset-shadow-2xs"
+              className="h-full w-full rounded-xl scheme-dark inset-shadow-2xs"
+              onDoubleClick={toggleFullscreen}
             ></video>
           </div>
 
@@ -138,7 +178,12 @@ const Video = () => {
                         ? "bg-[#272727] text-white"
                         : "bg-white"
                     } cursor-pointer px-4`}
-                    onClick={() => toggleSubscribe({ channelId: video?.owner?._id, setVideo })}
+                    onClick={() =>
+                      toggleSubscribe({
+                        channelId: video?.owner?._id,
+                        setVideo,
+                      })
+                    }
                   >
                     <p className="self-center">
                       {video?.owner?.isSubscribed ? "Subscribed" : "Subscribe"}
@@ -167,6 +212,16 @@ const Video = () => {
                   </div>
                   <div className="rounded-full self-center p-1.5 bg-[#272727] cursor-pointer hover:text-white">
                     <Bookmark className="p-0.5" />
+                  </div>
+                  <div
+                    onClick={toggleFullscreen}
+                    className="bg-[#272727] p-2 rounded-full cursor-pointer"
+                  >
+                    {isFullscreen ? (
+                      <Minimize size={18} />
+                    ) : (
+                      <Maximize size={18} />
+                    )}
                   </div>
                 </div>
               </div>
